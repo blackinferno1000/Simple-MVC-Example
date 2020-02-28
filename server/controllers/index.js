@@ -1,5 +1,6 @@
 // pull in our models. This will automatically load the index.js from that folder
 const models = require('../models');
+const Cat = models.Cat.CatModel;
 
 // default fake data so that we have something to work with until we make a real Cat
 const defaultData = {
@@ -7,18 +8,36 @@ const defaultData = {
   bedsOwned: 0,
 };
 
-let lastAdded;
+let lastAdded = new Cat(defaultData);
+// console.dir(lastAdded);
 
 const hostIndex = (req, res) => {
-
+  res.render('index', {
+    currentName: lastAdded.name,
+    title: 'Home Page',
+    pageName: "Home Page",
+  });
 };
 
 const readAllCats = (req, res, callback) => {
-
+  Cat.find(callback).lean();
 };
 
 const readCat = (req, res) => {
- 
+  if(!req.query.nam){
+    return res.status(400).json({error: 'A name is needed!'});
+  }
+
+  const name1 = req.query.name;
+  const callback = (err, doc) => {
+    if(err) {
+      return res.status(500).json({err});
+    }
+
+    return res.json(doc);
+  }
+
+  Cat.findByName(name1, callback);
 };
 
 const hostPage1 = (req, res) => {
